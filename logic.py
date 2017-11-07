@@ -88,6 +88,9 @@ def parse(string):
                 if(a == "A" or a == "K" or a == "C" or a == "E"):
                         index = index + 1
                         need = need + 1
+                elif(a.isupper()):
+                        if(not a =="N" and not a == "L" and not a == "M"):
+                                return -1
                 elif(a.islower()):
                         need = need - 1
                         index = index + 1
@@ -502,7 +505,7 @@ while(not fin):
                 testshell(test)
                 print("Expected: Consistent")
                 print("[HINT]Since Modal Logic is not Truth Functional, p can be False while Possibly p is True!")
-                
+
                 test = ["Mp", "Mq", "Np", "Nq", "LNKpq"]
                 testshell(test)
                 print("Expected: Consistent")
@@ -529,7 +532,13 @@ while(not fin):
                 done = False
                 test = []
                 while(not done):
-                        a = input("Enter any formula in Polish notation.\nSymbols: A - or; K - and; N - not; M - Possibly; L - Necessarily; a through x - Atomic\nExample: p and (q or r) == KpAqr\n")
+                        iswff = False
+                        while(not iswff):
+                                a = input("Enter any formula in Polish notation.\nSymbols: A - or; K - and; N - not; M - Possibly; L - Necessarily; a through x - Atomic\nExample: p and (q or r) == KpAqr\n")
+                                temp = [a]
+                                iswff = wff(temp)
+                                if(not iswff):
+                                        print("SYNTAX ERROR: String entered is not a well-formed formula. Try again")
                         test.append(a)
                         b = input("Check for consistency? [1] yes [2] no")
                         if(b == "1"):
