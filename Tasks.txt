@@ -1,0 +1,11 @@
+Tasks Remaining
+
+1) Fix bugs
+
+2) GUI
+
+3) Improve formatting of printed branch history
+
+4) Write functions to translate between Polish notation and infix notation
+
+
