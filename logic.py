@@ -503,6 +503,10 @@ while(not fin):
                 print("Expected: Consistent")
                 print("[HINT]Since Modal Logic is not Truth Functional, p can be False while Possibly p is True!")
                 
+                test = ["Mp", "Mq", "Np", "Nq", "LNKpq"]
+                testshell(test)
+                print("Expected: Consistent")
+                
 
                 test = ["ALpMq", "LNq", "Np"]
                 testshell(test)
