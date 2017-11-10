@@ -8,4 +8,6 @@ Tasks Remaining
 
 4) Write functions to translate between Polish notation and infix notation
 
+5) Add functionality for conditionals and bi-conditionals
+
 
