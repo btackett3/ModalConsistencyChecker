@@ -1,6 +1,7 @@
 Tasks Remaining
 
 1) Fix bugs
+  a) In proccess modals function, after testing the necessities against the possibilities, try something like: "if d[1:0] contains  any 'L', then for each possible world, test [that world + d[1:0]] + M[w2] + M[w3] + ... each other world in the list"
 
 2) GUI
 
