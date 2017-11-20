@@ -10,4 +10,4 @@ Tasks Remaining
 
 5) Add functionality for conditionals and bi-conditionals
 
-
+6) For each atomic formula p in the starting set, add 'p or not p' to the argument
