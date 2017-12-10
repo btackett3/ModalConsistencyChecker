@@ -433,21 +433,12 @@ def testing(array, var, history):
                                 
 #Test Cases
 
-#print(collapse("KMpLNq"))
-#print("Done Collapsing")
-#print(tidy("KMpMNLq"))
-#print("Done tidying")
-#print(pushthrough("NLLa"))
-#print(pushthrough("MaNMMa"))
-#print(pushthrough("MaLNMLa"))
-
-
 fin = False
 
 print("This program takes arrays of formalized sentences and tells you whether they are consistent in Propositional Modal Logic (S5 Axiom System)")
 print("Tableau (truth tree) style inference is used to check consistency.")
 print("\t\t\tAuthor: Brian Tackett, University at Buffalo")
-print("\t\t\tCoded in Python for UB Hackathon 2017")
+print("\t\t\tCoded in Python originally for UB Hackathon 2017")
 print("Syntax: Formulas are in Polish (prefix) notation.\nSymbols: A - or; K - and; N - not; M - Possibly; L - Necessarily; a through x - Atomic\nExample: p and (q or r) == KpAqr\n")
 
 
