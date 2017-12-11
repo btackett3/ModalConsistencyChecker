@@ -10,5 +10,6 @@ Tasks Remaining
 4) Write functions to translate between Polish notation and infix notation
 
 5) Add functionality for conditionals and bi-conditionals
+  - C = AN
 
-6) For each atomic formula p in the starting set, add 'p or not p' to the argument
+6) When breaking down worlds, if there is a branch in a world, create two worlds - one for each branch - and copy over the actual world and necessities
