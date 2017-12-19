@@ -5,3 +5,5 @@ Tasks Remaining
 2) When breaking down worlds, if there is a branch in a world, create two worlds - one for each branch - and copy over the actual world and necessities
 
 3) Remove unneeded print statements
+
+4) Deal with necessities inside of worlds
