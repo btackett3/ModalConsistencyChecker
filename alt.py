@@ -14,10 +14,15 @@
 
 For Necessities in the list of Possibilities, add them to each world in their own worldclass, their corresponding branch, and their corresponding list of necessities
 
-
-
 '''
-        
+
+#check to see if all the worlds are empty
+def empty(worlds):
+        answer = True
+        for a in worlds:
+                if(a != []):
+                        answer = False
+        return answer
 
 #clear double negations
 def clearDN(string):
@@ -32,6 +37,8 @@ def clearDN(string):
                                 else:
                                         string = string[:i] + string[i+2:]
                                 cleared = False
+                        if string[i] == 'C':
+                                string = string[:i] + "AN" + string[i:]
                         i = i + 1
         return string
 
@@ -194,9 +201,11 @@ def addatomics(array):
 
 def removeclosed(array, modals, done, necessities):
 
+        '''
         print(array)
         print(modals)
         print(necessities)
+        '''
 
         copy = []
         copymodals = []
@@ -302,6 +311,7 @@ def processFormulas(formulas, branches, modals, necessities):
         while(f < len(formulas)):
                      
                 current = formulas[f]
+
                                 
                 #And/Conjunction
                 if(current.startswith('K')):
@@ -328,7 +338,7 @@ def processFormulas(formulas, branches, modals, necessities):
                                         i.append("N" + current[2:split])
                                         j.append("N" + current[split:])
                                         copies.append(j)
-                                branches.extend(copies)    
+                                branches.extend(copies)
                                         
 
                 #Or
@@ -524,13 +534,13 @@ def processPos(branches, modals, done, necessities):
                                 if(d.startswith('M')):
                                         done = False
                                         o = tidy(d[1:])
-                                        print(modals[branches.index(c)])
+                                        #print(modals[branches.index(c)])
                                         if modals[branches.index(c)] == [[]]:
                                                 modals[branches.index(c)] = [[o]]
                                         else:
                                                 modals[branches.index(c)].append([o])
                                                 #necessities.append([])
-                                        print(modals[branches.index(c)])
+                                        #print(modals[branches.index(c)])
                                         
                                         c.pop(c.index(d))
                                         start = 0
@@ -538,10 +548,12 @@ def processPos(branches, modals, done, necessities):
                                 else:
                                         needed = needed - 1
                                         start = start + 1
+                                        '''
         print("modals")
         print(modals)
         print("necessities")
         print(necessities)
+        '''
  
         branches = clean(branches)
         for a in modals:
@@ -556,19 +568,19 @@ def processPos(branches, modals, done, necessities):
 
 def processNec(branches, modals, done, necessities):
 
-              
+        '''
         print("Branches")
         print(branches)
         print("Necessities - Modals")
         print(modals)
-        
+        '''
 
         done = True
 
         if not necessities:
                 necessities = [[]] * len(modals)
-        print("Necessities")
-        print(necessities)
+        #print("Necessities")
+        #print(necessities)
         
         needed = 1
         while(needed > 0):
@@ -732,19 +744,24 @@ def testing(array):
 
                 done = True
                 index = 0
-                while(index < len(worlds)):
-                        worldclass = worlds[index]
-                        print("Worldclass is:")
-                        print(worldclass)
-                        temp = [[[]]] * len(worldclass)
-                        t = [[]] * len(temp)
-                        case = processBranches(worldclass, temp, True, t)
-                        worldclass = case[0]
-                        print("Worldclass has become:")
-                        print(worldclass)
-                        done = done and case[2]
-                        worlds[index] = worldclass
-                        index = index + 1
+
+                if(empty(worlds)):
+                        pass
+                
+                else:
+                        while(index < len(worlds)):
+                                worldclass = worlds[index]
+                                #print("Worldclass is:")
+                                #print(worldclass)
+                                temp = [[[]]] * len(worldclass)
+                                t = [[]] * len(temp)
+                                case = processBranches(worldclass, temp, True, t)
+                                worldclass = case[0]
+                                #print("Worldclass has become:")
+                                #print(worldclass)
+                                done = done and case[2]
+                                worlds[index] = worldclass
+                                index = index + 1
 
         #break down worlds that still contain M
         
@@ -786,21 +803,6 @@ def testing(array):
 #Test Cases
 
 fin = False
-
-
-test = [[['p', 'Nq'], ['p'], ['p', 'Nq', 'Li']], [['p', 'Nq'], ['p'], ['p', 'Nq', 'Li']], [['p', 'Nq'], ['p'], ['p', 'Nq', 'Li']], [['p', 'Nq'], ['p'], ['p', 'Nq', 'Li']], [['p', 'Nq', 'i'], ['p', 'Nq', 'i', 'Li']], [['p', 'Nq', 'i'], ['p', 'Nq', 'i', 'Li']]]
-print(test)
-index = 0
-test = crashall(test)
-print(test)
-
-print("This program takes arrays of formalized sentences and tells you whether they are consistent in Propositional Modal Logic (S5 Axiom System)")
-print("Tableau (truth tree) style inference is used to check consistency.")
-print("\t\t\tAuthor: Brian Tackett, University at Buffalo")
-print("\t\t\tCoded in Python for UB Hackathon 2017")
-print("Syntax: Formulas are in Polish (prefix) notation.\nSymbols: A - or; K - and; N - not; M - Possibly; L - Necessarily; a through x - Atomic\nExample: p and (q or r) == KpAqr\n")
-
-
 
 while(not fin):
         var = input("\n[1] See non-modal sample tests [2] See modal tests [3] Enter custom tests [4] Exit: ")
@@ -876,6 +878,10 @@ while(not fin):
                 test = ["LAMpLi", "KMpMNLq", "NKaMp"]
                 testshell(test)
                 print("Expected:  Pretty complicated, huh?  (Actually, it is expected to be consistent, after some pen and paper proof)")
+
+                test = ['Mp', 'MNp', 'LANpLp']
+                testshell(test)
+                print("Expected: Inconsistent")
                 
         #User Inputted Tests
         elif(var == "3"):
