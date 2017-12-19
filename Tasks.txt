@@ -1,14 +1,9 @@
 Tasks Remaining
 
-1) Fix bugs
-  a) In proccess modals function, after testing the necessities against the possibilities, try something like: "if d[1:0] contains  any 'L', then for each possible world, test [that world + d[1:0]] + M[w2] + M[w3] + ... each other world in the list"
+1) Write functions to translate between Polish notation and infix notation
 
-2) GUI
+2) When breaking down worlds, if there is a branch in a world, create two worlds - one for each branch - and copy over the actual world and necessities
 
-3) Improve formatting of printed branch history
+3) Remove unneeded print statements
 
-4) Write functions to translate between Polish notation and infix notation
-
-5) Add functionality for conditionals and bi-conditionals
-
-6) For each atomic formula p in the starting set, add 'p or not p' to the argument
+4) Deal with necessities inside of worlds
