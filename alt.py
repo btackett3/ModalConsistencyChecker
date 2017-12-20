@@ -12,7 +12,13 @@
 
 '''
 
-For Necessities in the list of Possibilities, add them to each world in their own worldclass, their corresponding branch, and their corresponding list of necessities
+ When creating a world, make sure to add all necessities to it. FROM A MODEL BRANCH, OR FROM A WORLD
+
+ When splitting a branch, make sure you are copying over modals and necessities
+
+ Remove models that are duplicates of other models, but in a different order
+
+ For worlds, add p or not p, for each atomic in the starting formulas
 
 '''
 
@@ -199,36 +205,57 @@ def addatomics(array):
 
 #Removes all closed branches
 
-def removeclosed(array, modals, done, necessities):
+def removeclosed(models, worlds, done, necessities):
 
         '''
-        print(array)
-        print(modals)
+        print(models)
+        print(worlds)
         print(necessities)
         '''
 
         copy = []
-        copymodals = []
+        copyworlds = []
         copynec = []
         index = 0
         closed = []
-        for a in array:
+        for model in models:
         #check each negated element for its positive
-                for b in a:
-                        if(b.startswith('N')):
-                                if(a.count(b[1:]) > 0):
+                for string in model:
+                        if(string.startswith('N')):
+                                if(model.count(string[1:]) > 0):
                                         closed.append(index)
                 index = index + 1
+
+        #check to make sure no worlds are impossible
+
+        index = 0
+
+        for worldclass in worlds:
+                for world in worldclass:
+                        for string in world:
+                                if(string.startswith('N')):
+                                        if(world.count(string[1:]) >0):
+                                                closed.append(index)
+                index = index + 1
+
+                
         i = 0
-        while(i < len(array)):
+        while(i < len(models)):
                 if i in closed:
                         i = i + 1
                 else:
-                        copy.append(array[i])
-                        copymodals.append(modals[i])
+                        copy.append(models[i])
+                        copyworlds.append(worlds[i])
                         copynec.append(necessities[i])
                         i = i + 1
-        return [copy, copymodals, done, copynec]
+
+        '''
+        print(copy)
+        print(copyworlds)
+        print(copynec)
+        '''
+
+        return [copy, copyworlds, done, copynec]
 
 def closemodals(array, modals, done, necessities):
         copy = []
@@ -255,7 +282,16 @@ def closemodals(array, modals, done, necessities):
                         i = i + 1
         return [copy, copymodals, done, copynec]
 
-                
+
+#Remove duplicates from everything
+
+def cleanall(model, worlds, necessities):
+        model = clean(model)
+        for world in worlds:
+                world = clean(world)
+        necessities = clean(necessities)
+        return(model, worlds, necessities)
+      
 
 #Remove duplicates
 
@@ -391,7 +427,7 @@ def processBranches(branches, modals, done, necessities):
 
         done = True
         if not branches:
-                return [branches, modals]
+                return [branches, modals, done, necessities]
         needed = 1
         while(needed > 0):
                 for c in branches:
@@ -497,7 +533,7 @@ def processBranches(branches, modals, done, necessities):
                            tidy(m)
         return [branches, modals, done, necessities]
 
-#breaks down modals
+#breaks down modals within a branch
 def processPos(branches, modals, done, necessities):
 
         '''
@@ -511,7 +547,7 @@ def processPos(branches, modals, done, necessities):
 
         clean(branches)
         if not branches:
-                return [branches, modals, done]
+                return [branches, modals, done, necessities]
 
         #If modals is empty, make an array of the same length as branches
         if not modals:
@@ -581,46 +617,49 @@ def processNec(branches, modals, done, necessities):
                 necessities = [[]] * len(modals)
         #print("Necessities")
         #print(necessities)
-        
-        needed = 1
-        while(needed > 0):
-                for c in branches:
-                        needed = len(c)
 
-                        k = 0
-                        while(k < len(c)):
-                                c[k] = tidy(c[k])
-                                k = k + 1
+       
+                
+        if branches:
+                needed = 1
+                while(needed > 0):
+                        for c in branches:
+                                needed = len(c)
 
-                        start = 0
-                        while(start < len(c)):
-                                d = c[start]
-                                d = tidy(d)
+                                k = 0
+                                while(k < len(c)):
+                                        c[k] = tidy(c[k])
+                                        k = k + 1
 
-                                #For necessities, add them to the branch and the possibilities
-                                if(d.startswith('L')):
+                                start = 0
+                                while(start < len(c)):
+                                        d = c[start]
+                                        d = tidy(d)
 
-                                        
-                                        done = False
-                                        c.append(d[1:])
-                                        
-                                                        
-                                        c.pop(c.index(d))
+                                        #For necessities, add them to the branch and the possibilities
+                                        if(d.startswith('L')):
 
-                                        f = necessities[branches.index(c)]
-                                        f.append(d[1:])
-
-                                        e = modals[branches.index(c)]
-                                              
-                                        for p in e:
-                                                p.append(d[1:])
-
-                                        start = 0
-                                        needed = len(c)                                         
                                                 
-                                else:
-                                        needed = needed - 1
-                                        start = start + 1
+                                                done = False
+                                                c.append(d[1:])
+                                                
+                                                                
+                                                c.pop(c.index(d))
+
+                                                f = necessities[branches.index(c)]
+                                                f.append(d[1:])
+
+                                                e = modals[branches.index(c)]
+                                                      
+                                                for p in e:
+                                                        p.append(d[1:])
+
+                                                start = 0
+                                                needed = len(c)                                         
+                                                        
+                                        else:
+                                                needed = needed - 1
+                                                start = start + 1
 
         #print(modals)
 
@@ -638,16 +677,177 @@ def processNec(branches, modals, done, necessities):
         done = temp[2]
         necessities = temp[3]
 
-        return(branches, modals, done, necessities)                                                            
-                        
+        return(branches, modals, done, necessities)
+
+
+
+
+#Simplify worlds - for each world, break down all the non-modal complexity
+
+def simplifyworlds(branches, modals, done, necessities):
+
+        open = removeclosed(branches, modals, done, necessities)
+
+        branches = open[0]
+        modals = open[1]
+        necessities = open[3]
+        
+        branches = clean(branches)
+
+        '''
+        
+        print("Branches")
+        print(branches)
+        print("Modals")
+        print(modals)
+        '''
+
+        done = True
+        if not branches:
+                return [branches, modals, done, necessities]
+        needed = 1
+        while(needed > 0):
+                for worldclass in modals:
+                        for world in worldclass:
+                                needed = len(world)
+                                
+                                for d in world:
+
+                                        #And - add both conjuncts to the world
+                                        if(d.startswith('K')):
+                                                done = False
+                                                split = parse(d)
+                                                world.append(d[1:split])
+                                                world.append(d[split:])
+                                                world.pop(world.index(d))
+                                                needed = len(world)
+
+                                        #Or - if there is a branch in a world, create a new branch and copy over the actual world and necessities - add one disjunct+world to that and one disjunct+world to current.
+                                        elif(d.startswith('A')):
+                                                done = False
+                                                split = parse(d)
+
+                                                #make a copy of the worldclass, except for the current world
+                                                newworldclass = []
+                                                for w in worldclass:
+                                                        if w != world:
+                                                                newworldclass.append(w)
+                                                
+                                                #create a new world
+                                                right = []
+                                                for formula in world:
+                                                        right.append(formula)
+
+                                                #split the disjuncts between current and new world
+                                                world.append(d[1:split])
+                                                right.append(d[split:])
+                                                right.pop(world.index(d))
+                                                world.pop(world.index(d))
+
+
+                                                #Copy the branch and necessities 
+
+                                                index = modals.index(worldclass)
+
+                                                copybranch = branches[index]
+                                                copynec = necessities[index]
+                                                branches.append(copybranch)
+                                                necessities.append(copynec)
+
+                                                #Add the new world to the new worldclass
+
+                                                newworldclass.append(right)
+
+                                                #Add the new worldclass to the set of worldclasses
+
+                                                modals.append(newworldclass)
+                                                
+                                                needed = len(world)
+
+                                        #Not
+                                        elif(d.startswith('N')):
+                                                #print(d)
+                                                if(d[1] == 'A'):
+                                                        done = False
+                                                        split = parse(d)
+                                                        world.append("N" + d[2:split])
+                                                        world.append("N" + d[split:])
+                                                        world.pop(world.index(d))
+                                                        needed = len(world)
+             
+                                                elif(d[1] == 'K'):
+
+                                                        done = False
+                                                        split = parse(d)
+
+                                                        #make a copy of the worldclass, except for the current world
+                                                        newworldclass = []
+                                                        for w in worldclass:
+                                                                if w != world:
+                                                                        newworldclass.append(w)
+                                                        
+                                                        #create a new world
+                                                        right = []
+                                                        for formula in world:
+                                                                right.append(formula)
+
+                                                        #split the disjuncts between current and new world
+                                                        world.append("N" + d[2:split])
+                                                        right.append("N" + d[split:])
+                                                        right.pop(world.index(d))
+                                                        world.pop(world.index(d))
+
+
+                                                        #Copy the branch and necessities 
+
+                                                        index = modals.index(worldclass)
+
+                                                        copybranch = branches[index]
+                                                        copynec = necessities[index]
+                                                        branches.append(copybranch)
+                                                        necessities.append(copynec)
+
+                                                        #Add the new world to the new worldclass
+
+                                                        newworldclass.append(right)
+
+                                                        #Add the new worldclass to the set of worldclasses
+
+                                                        modals.append(newworldclass)
+                                                        
+                                                        needed = len(world)
+                                                else:
+                                                        needed = needed - 1
+                                              
+                                        else:
+                                                needed = needed - 1
+                                           
+
+        open = removeclosed(branches, modals, done, necessities)
+        #print(branches)
+
+        branches = open[0]
+        modals = open[1]
+        necessities = open[3]
+        #print(branches)
+
+        for m in branches:
+                if "L" in m or "M" in m:
+                           tidy(m)
+        return [branches, modals, done, necessities]
+
+
+'''
+Change return parameters and eliminate this function.  Just use removeclosed, instead.
+'''
+
 #check each branch to see whether one is open (tree is consistent)
 def check(array, modals, done, necessities):             
-        model = removeclosed(array, modals, True, necessities)
-        model = model[0]
-        if not model:
-                return None
-        else:
-                return [model, modals, necessities]
+        result = removeclosed(array, modals, True, necessities)
+        model = result[0]
+        modals = result[1]
+        necessities = result[3]
+        return [model, modals, necessities]
                                                 
 
 #Test Function - Tells you whether a set is consistent
@@ -662,7 +862,7 @@ def testshell(array):
 
         
         val = testing(array)
-        if(val == None):
+        if(val[0] == [] or val == None):
                 print("No open leaves")
                 print("The set is inconsistent")
         else:
@@ -687,120 +887,243 @@ def testing(array):
                 print("It is False that the set contains all well-formed formulas\n")
                 return
 
-        #print("Initializing")
         case = initialize(array)
 
-        #print("Processing Formulas")
         case = processFormulas(case[0], case[1], case[2], case[3])
-
-        #print("Case is")
-        #print(case)
-
+        
         nonmodal = False
         pos = False
         nec = False
 
         done = nonmodal and pos and nec
 
+        '''
+        Start a loop here.
+        '''
+
+        complete = False
+        while(not complete):
+
         #break down all the original branches
+                complete = True
+                didstuff = False
+                while not done:
+                        didstuff = True
+                        #print("Processing Branches")
+                        case = processBranches(case[0], case[1], case[2], case[3])
 
-        while not done:
-
-                #print("Processing Branches")
-                case = processBranches(case[0], case[1], case[2], case[3])
-                if not case[0]:
-                        return None
+                        
                 
-                #print("Processing Pos")
-                nonmodal = case[2]
-                #print("Nonmodal Done?")
-                #print(nonmodal)
-                case = processPos(case[0], case[1], case[2], case[3])
-                #print("Processing Nec")
-                #print("Pos done?")
-                pos = case[2]
-                necessities = case[3]
-                #print(pos)
-                case = processNec(case[0], case[1], case[2], case[3])
-                nec = case[2]
+                        nonmodal = case[2]
 
-                necessities = case[3]
-                #print("Nec Done?")
-                #print(nec)
-                done = nonmodal and pos and nec
+                        case = processPos(case[0], case[1], case[2], case[3])
+                        
+
+                        pos = case[2]
+                        necessities = case[3]
+
+                        case = processNec(case[0], case[1], case[2], case[3])
+                        nec = case[2]
+                        
+                        necessities = case[3]
+
+                        done = nonmodal and pos and nec
+                        complete = done
        
-        result = check(case[0], case[1], True, necessities)
-        model = result[0]
-        worlds = result[1]
-        worlds = crashall(worlds)
-        necessities = result[2]
-        model = clean(model)
+
+                if didstuff:
+                        result = check(case[0], case[1], True, necessities)
+                        model = result[0]
+                        worlds = result[1]
+                        worlds = crashall(worlds)
+                        necessities = result[2]
+                model = clean(model)
+
+                '''
+                print("Model")
+                print(model)
+                print("Worlds")
+                print(worlds)
+                print("Necessities")
+                print(necessities)
+                '''
 
         #break down all the worlds that still contain non-modal connectives
 
-        done = False
+                done = False
 
-        while not done:
+                while not done:
 
-                done = True
-                index = 0
+                        done = True
+                        index = 0
 
-                if(empty(worlds)):
-                        pass
+                        if(empty(worlds)):
+                                pass
                 
-                else:
-                        while(index < len(worlds)):
-                                worldclass = worlds[index]
-                                #print("Worldclass is:")
-                                #print(worldclass)
-                                temp = [[[]]] * len(worldclass)
-                                t = [[]] * len(temp)
-                                case = processBranches(worldclass, temp, True, t)
-                                worldclass = case[0]
-                                #print("Worldclass has become:")
-                                #print(worldclass)
+                        else:
+                                case = simplifyworlds(model, worlds, done, necessities)
+
+                                model = case[0]
+                                worlds = case[1]
+
                                 done = done and case[2]
-                                worlds[index] = worldclass
-                                index = index + 1
+                                complete = complete and done
+                                necessities = case[3]
+                                        
+                '''
+                print("Model")
+                print(model)
+                print("Worlds")
+                print(worlds)
+                print("Necessities")
+                print(necessities)
+                '''
+
+                result = check(model, worlds, True, necessities)
+                model = result[0]
+                worlds = result[1]
+                worlds = crashall(worlds)
+                necessities = result[2]
+                model = clean(model)
 
         #break down worlds that still contain M
         
-        done = False
+                done = False
 
-        while not done:
+                while not done:
 
-                done = True
-                index = 0
+                        done = True
+                        index = 0
 
-                while(index < len(worlds)):
-                        worldclass = worlds[index]
+                        while(index < len(worlds)):
+                                worldclass = worlds[index]
 
-                        for world in worldclass:
-                                for string in world:
-                                        if(string.startswith("M")):
-                                                done = False
-                                                found = False
+                                for world in worldclass:
+                                        for string in world:
+                                                if(string.startswith("M")):
+                                                        done = False
+                                                        complete = False
+                                                        found = False
                                                 #check if there is a world that satisifies it
-                                                for a in worldclass:
-                                                        for b in a:
-                                                                if(b == string[1:]):
-                                                                        found = True
+                                                        for a in worldclass:
+                                                                for b in a:
+                                                                        if(b == string[1:]):
+                                                                                found = True
                                                                         
                                                 #if not, create a world with that + the necessities
 
-                                                if not found:
-                                                        newworld = [string[1:]] + necessities[index]
-                                                        worldclass.append(newworld)
+                                                        if not found:
+                                                                newworld = [string[1:]] + necessities[index]
+                                                                worldclass.append(newworld)
                                                         
-                                                world.pop(world.index(string))
-                        worlds[index] = worldclass
-                        index = index + 1
+                                                        world.pop(world.index(string))
+                                worlds[index] = worldclass
+                                index = index + 1
                
 
-        worlds = crashall(worlds)
+                worlds = crashall(worlds)
+
+                '''
+                print("Model")
+                print(model)
+                print("Worlds")
+                print(worlds)
+                print("Necessities")
+                print(necessities)
+                '''
+                
+                result = check(model, worlds, True, necessities)
+                model = result[0]
+                worlds = result[1]
+                #worlds = crashall(worlds)
+                necessities = result[2]
+                #model = clean(model)
+                
+        
+        #break down worlds that still contain L
+
+        
+                done = False
+
+                while not done:
+
+                        done = True
+                        index = 0
+
+                        while(index < len(worlds)):
+                                worldclass = worlds[index]
+
+                                for world in worldclass:
+                                        for string in world:
+
+                                        #For Necessities in the list of Possibilities, add them to each world in their own worldclass, their corresponding branch, and their corresponding list of necessities.
+                                                if(string.startswith("L")):
+                                                        done = False
+                                                        complete = False
+
+                                                #Add it to each world in its worldclass
+                                                        for w in worldclass:   
+                                                                w.append(string[1:])
+                                                                        
+                                                #Add it to the branch
+                                                        model[index].append(string[1:])
+
+                                                #Add it to the list of necessities
+                                                        necessities[index] = necessities[index] + [string[1:]]
+
+                                                #Remove the operator from the original string
+                                                        world.pop(world.index(string))
+                                worlds[index] = worldclass
+                                index = index + 1
+               
+
+                worlds = crashall(worlds)
+                '''
+                print("Model")
+                print(model)
+                print("Worlds")
+                print(worlds)
+                print("Necessities")
+                print(necessities)
+                '''
+                result = check(model, worlds, True, necessities)
+                model = result[0]
+                worlds = result[1]
+                worlds = crashall(worlds)
+                necessities = result[2]
+                model = clean(model)
+
+                
+                squeaky = cleanall(model, worlds, necessities)
+                model = squeaky[0]
+                worlds = squeaky[1]
+                necessities = squeaky[2]
+
+                '''
+                print("Model")
+                print(model)
+                print("Worlds")
+                print(worlds)
+                print("Necessities")
+                print(necessities)
+                '''
+                
+        
+        #Check for inconsistencies.  If a model contains an inconsistency, throw it, its worlds, and its necessities out.  If a world contains an inconsistency, throw its worldclass, its model, and its necessities out.
+
+        '''
+        All models and all worlds need to only contain atomics.  If not, loop.
+        
+        End the loop here.
+        '''
+        
         return [model, worlds, necessities]
                                 
 #Test Cases
+
+test = ["LALoLp", "Np"]
+testshell(test)
+print("Expected: Consistent")
 
 fin = False
 
@@ -856,7 +1179,6 @@ while(not fin):
                 test = ["Ma", "Na"]
                 testshell(test)
                 print("Expected: Consistent")
-                print("[HINT]Since Modal Logic is not Truth Functional, p can be False while Possibly p is True!")
 
                 test = ["Mp", "Mq", "Np", "Nq", "LNKpq"]
                 testshell(test)
@@ -877,35 +1199,12 @@ while(not fin):
 
                 test = ["LAMpLi", "KMpMNLq", "NKaMp"]
                 testshell(test)
-                print("Expected:  Pretty complicated, huh?  (Actually, it is expected to be consistent, after some pen and paper proof)")
+                print("Expected:  Consistent")
 
                 test = ['Mp', 'MNp', 'LANpLp']
                 testshell(test)
                 print("Expected: Inconsistent")
                 
-        #User Inputted Tests
-        elif(var == "3"):
-                done = False
-                test = []
-                while(not done):
-                        iswff = False
-                        while(not iswff):
-                                a = input("Enter any formula in Polish notation.\nSymbols: A - or; K - and; N - not; M - Possibly; L - Necessarily; a through x - Atomic\nExample: p and (q or r) == KpAqr\n")
-                                temp = [a]
-                                iswff = wff(temp)
-                                if(not iswff):
-                                        print("SYNTAX ERROR: String entered is not a well-formed formula. Try again")
-                        test.append(a)
-                        b = input("Check for consistency? [1] yes [2] no")
-                        if(b == "1"):
-                                testshell(test)
-                        c = input("[a] Add more formulas [b] Clear formulas [c] Exit program:")
-                        if(c == "b" or c == "B"):
-                                while(len(test)>0):
-                                        test.pop(0)
-                        elif(c == "c" or c == "C"):
-                                done = True
-                                fin = True
         else:
                 fin = True
 
