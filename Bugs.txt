@@ -1,3 +1,0 @@
-Known Bugs:
-
-Testing ['Mp', 'MNp', 'LANpLp'] gives the incorrect result. ["Possibly p", "Possibly not p", "Necessarily, (if p, then necessarily p)"] should be inconsistent, but the program says they are consistent.
