@@ -2,16 +2,17 @@
 # Started: 11/4/2017
 # Modal Logic (S5) Calculator
 
+#This program tells you whether a set of formalized sentences of modal logic are consistent
+#There are several helper functions used in processing the sentences
+
+#Changes a string in Polish (prefix) notation to a more conventional (infix) notation
+#Calls these functions:  infix
 
 def unpolish(string):
-
     index = 0
-
     copy = ''
-
     while index < len(string):
         a = string[index]
-
         if a == "K":
             a = "&"
         elif a == "N":
@@ -24,32 +25,23 @@ def unpolish(string):
             a = "P"
         elif a == "L":
             a = "N"
-
         copy = copy + a
-
         index = index + 1
-
     copy = infix(copy)
-
     return copy
 
-def infix(copy):
+#Converts a string from prefix to infix notation
 
-    print(copy)
+def infix(copy):
     index = 0
     answer = ''
-
     if len(copy) == 1:
         return copy
-
     while index < len(copy):
-
         c = copy[index]
-        print(c)
         if c == "&" or c == "V":
             need = 1
             jump = 1
-
             while need > 0:
                 if copy[index + jump].islower():
                     need = need - 1
@@ -61,22 +53,15 @@ def infix(copy):
                 else:
                     jump = jump + 1
             left = copy[index+1:index+jump+1]
-            #print("left is")
-            #print(left)
-
             right = copy[index+jump+1:]
-
-            #print("right is")
-            #print(right)
-
             answer = answer + "(" + infix(left) + c + infix(right) + ")"
             return answer
         else:
             answer = answer + c
             index = index + 1
-
     return answer
 
+#Changes a string from infix to prefix notation
 
 def makeprefix(string):
 
