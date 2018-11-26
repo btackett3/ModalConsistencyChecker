@@ -8,7 +8,7 @@ from weblogic import parse
 fin = False
 
 while (not fin):
-    var = input("\n[1] See non-modal sample tests [2] See modal tests [3] Unsolved [4] Parsing [5] Quit: ")
+    var = input("\n[1] See non-modal sample tests [2] See modal tests [3] Unsolved [4] Parsing [5] Quit. Enter the number as a string, e.g. "1": ")
     # Sample Nonmodal Tests
     if (var == "1"):
         test = ["a", "b"]
