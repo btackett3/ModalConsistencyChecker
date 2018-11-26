@@ -31,6 +31,7 @@ def unpolish(string):
     return copy
 
 #Converts a string from prefix to infix notation
+#Calls: infix
 
 def infix(copy):
     index = 0
@@ -62,31 +63,28 @@ def infix(copy):
     return answer
 
 #Changes a string from infix to prefix notation
+#Calls: makeprefix, findmajor
 
 def makeprefix(string):
-
     if string == '':
         return ''
 
     #find the major connective
-
     major = findmajor(string)
+    
     #print("Major is")
     #print(major)
 
     #make the left polish
-
     left = ''
-
     if major > 0:
         left = makeprefix(string[:major])
+        
     #print("Left is")
     #print(left)
 
     #make the right polish
-
     right = ''
-
     if major < len(string):
         right = makeprefix(string[major + 1:])
 
@@ -94,24 +92,20 @@ def makeprefix(string):
     #print(right)
 
     #major + left + right
-
     answer = string[major] + left + right
     return answer
 
+#Converts a string into Polish notation
+#Calls: makeprefix
+
 def makepolish(string):
-
     answer = makeprefix(string)
-
     index = 0
-
-
+    
     #convert symbols
-
     copy = ''
-
     while index < len(answer):
         a = answer[index]
-
         if a == "&":
             a = "K"
         elif a == "~":
@@ -124,32 +118,26 @@ def makepolish(string):
             a = "M"
         elif a == "N":
             a = "L"
-
         copy = copy + a
-
         index = index + 1
 
     #get rid of parentheses
-
     polish = ''
-
     for l in copy:
         if l == "(" or l == ")":
             pass
         else:
             polish = polish + l
-
     return polish
 
+#Finds the major connective of a formula
 
 def findmajor(string):
-
     major = 0
     depth = 0
     index = 0
-
+    
     while index < len(string):
-
         b = string[index]
         if b == "(":
             depth = depth + 1
@@ -158,12 +146,11 @@ def findmajor(string):
         elif depth == 0:
             if b == "&" or b == "V" or b == ">":
                 major = index
-
         index = index + 1
-
     return major
 
-# check to see if all the worlds are empty
+# Check to see if all the worlds are empty
+
 def empty(worlds):
     answer = True
     for a in worlds:
@@ -173,6 +160,7 @@ def empty(worlds):
 
 
 # clear double negations
+
 def clearDN(string):
     cleared = False
     while (not cleared):
@@ -192,6 +180,7 @@ def clearDN(string):
 
 
 # collapse modal formulas; LLp is equivalent to Lp in S5; MLp is equivalent to Lp; MMp is equivalent to Mp
+
 def collapse(string):
     cleared = False
     while (not cleared):
@@ -213,66 +202,10 @@ def collapse(string):
             i = i + 1
     return string
 
+# Pushes negations through to the right of modal operators
+# Not Necessarily is equivalent to Possibly Not
+# Not Possibly is equivalent to Necessarily Not
 
-# Crashes all the worldclasses in the range of worlds
-'''
-Since crash function does not work, this is commented to do nothing
-'''
-
-
-def crashall(worlds):
-    copy = []
-    for a in worlds:
-        a = crash(a)
-        copy.extend(a)
-    # return copy
-    return worlds
-
-
-# In a worldclass, if one world is a proper subset of another, get rid of that smaller world
-'''
-This function doesn't work right now... It can probably be removed
-'''
-
-
-def crash(worldclass):
-    # print("Worldclass")
-    # print(worldclass)
-    small = []
-    copy = []
-    index = 0
-    while (index < len(worldclass)):
-        other = 0
-        while (other < len(worldclass)):
-            if (index != other):
-                subset = True
-                for string in worldclass[index]:
-                    if string not in worldclass[other]:
-                        subset = False
-
-                if subset:
-                    small.append(index)
-            other = other + 1
-        index = index + 1
-    '''
-    print("Worldclass")
-    print(worldclass)
-    print("Small")
-    print(small)
-    '''
-    i = 0
-    while (i < len(worldclass)):
-        if i in small:
-            i = i + 1
-        else:
-            copy.append(worldclass[i])
-            i = i + 1
-    # print("Copy")
-    # print(copy)
-    return [copy]
-
-
-# pushes negations through to the right of modal operators
 def pushthrough(string):
     i = 0
     while (i < len(string)):
@@ -285,11 +218,10 @@ def pushthrough(string):
         i = i + 1
     return string
 
+# Pushes through and collapses until all negations are fartherst right and all redundant modal operators are gone
+# Calls: pushthrough, collapse, tidy
 
-# pushes through and collapses until tidy
 def tidy(string):
-    #print("Tidying")
-    #print(string)
     copy = ""
     for a in string:
         copy = copy + a
@@ -305,9 +237,8 @@ def tidy(string):
         return tidy(string)
     return string
 
+# Check whether a string is a well-formed formula
 
-
-# Check whether a string is a wff
 def wellformed(string):
     index = 0
     need = 1
@@ -321,7 +252,6 @@ def wellformed(string):
     while (index < len(string)):
         a = string[index]
         if need == 0:
-            #print("here")
             return -1
         elif (a == "A" or a == "K" or a == "C" or a == "E"):
             index = index + 1
@@ -341,13 +271,12 @@ def wellformed(string):
     return index
 
 # Split a string, based on major connective
-def parse(string):
+# Calls: wellformed
 
+def parse(string):
     if len(string) == 1 and string.islower():
         return 0
-
     if "A" not in string and "K" not in string and "C" not in string and "E" not in string:
-        print("here")
         return len(string)
 
     '''
@@ -359,14 +288,12 @@ def parse(string):
 
     need = 1
     index = 0
-
     while need > 0:
         if string[index] == "A" or string[index] == "K" or string[index] == "C" or string[index] == "E":
             index = index + 1
             need = need - 1
         else:
             index = index + 1
-
     splitter = index
     end = splitter + 1
 
@@ -374,15 +301,14 @@ def parse(string):
 
     while(end < len(string)):
         if wellformed(string[splitter:end]) > -1:
-            #print(string[splitter:end] + " is wellformed")
             return end
         else:
             end = end + 1
-
     return -1
 
 
-# Check that formulas are well-formed formulas (have the correct syntax)
+# Check that formulas in an array are all well-formed formulas (have the correct syntax)
+# Calls: wellformed
 
 def wff(array):
     i = 0
@@ -430,7 +356,7 @@ def removeclosed(models, worlds, done, necessities):
     print(worlds)
     print(necessities)
     '''
-
+    
     copy = []
     copyworlds = []
     copynec = []
@@ -445,9 +371,7 @@ def removeclosed(models, worlds, done, necessities):
         index = index + 1
 
     # check to make sure no worlds are impossible
-
     index = 0
-
     for worldclass in worlds:
         for world in worldclass:
             for string in world:
@@ -471,9 +395,9 @@ def removeclosed(models, worlds, done, necessities):
     print(copyworlds)
     print(copynec)
     '''
-
     return [copy, copyworlds, done, copynec]
 
+# Remove branches that contain worlds that are inconsistent with each other
 
 def closemodals(array, modals, done, necessities):
     copy = []
@@ -524,13 +448,9 @@ def cleanall(model, worlds, necessities):
 
     while (index < len(model)):
         j = index + 1
-
         while (j < len(model)):
-
             if (model[index] == model[j]):
-
                 if (worlds[index] == worlds[j]):
-
                     if (necessities[index] == necessities[j]):
                         copies.append(index)
             j = j + 1
@@ -569,7 +489,7 @@ def cleanall(model, worlds, necessities):
     return (model, worlds, necessities)
 
 
-# Remove duplicates
+# For an array of arrays, remove duplicates from each array in the larger array
 
 def clean(array):
     i = 0
@@ -594,10 +514,9 @@ def removedupes(array):
     return copy
 
 
-#Convert C to AN
+#Convert C to AN, i.e. "if p then q" to "not p or q"
 
 def changeC(string):
-
     index = 0
     while index < len(string):
         if string[index] == 'C':
@@ -609,12 +528,8 @@ def changeC(string):
 
 # Initialize
 
-
 def initialize(array):
     formulas = array
-
-    # print("Starting Formulas:")
-    # print(formulas)
     a = 0
     while (a < len(formulas)):
         formulas[a] = changeC(formulas[a])
@@ -638,16 +553,11 @@ def initialize(array):
 
 def processFormulas(formulas, branches, modals, necessities):
     # Loop through the formulas, simplifying each in turn
-    #print("Processing formulas")
-    #print(formulas)
-    # print("Necessities")
-    # print(necessities)
 
     f = 0
     while (f < len(formulas)):
-
         current = formulas[f]
-
+        
         # And/Conjunction
         if (current.startswith('K')):
             split = parse(current)
@@ -691,14 +601,7 @@ def processFormulas(formulas, branches, modals, necessities):
             for i in branches:
                 i.append(current)
         f = f + 1
-    '''
-    print("Branches")
-    print(branches)
-    print("Modals")
-    print(modals)
-    print("Necessities")
-    print(necessities)
-    '''
+
     modals = [[[]]] * len(branches)
     nec = necessities
     necessities = [necessities]
@@ -709,39 +612,18 @@ def processFormulas(formulas, branches, modals, necessities):
 
     i = 0
 
-    '''
-    print("Branches")
-    print(branches)
-    print("Modals")
-    print(modals)
-    print("Necessities")
-    print(necessities)
-    print("Done processing formulas")
-    '''
-
     return [branches, modals, True, necessities]
 
 
 # Break down each branch to atomics and modals
-def processBranches(branches, modals, done, necessities):
-    #print("Processing Branches")
-    open = removeclosed(branches, modals, done, necessities)
 
+def processBranches(branches, modals, done, necessities):
+    open = removeclosed(branches, modals, done, necessities)
     branches = open[0]
     modals = open[1]
     necessities = open[3]
-
+    
     branches = clean(branches)
-
-    '''
-    if branches:
-        print("Branches")
-        print(branches[0])
-        print("Modals")
-        print(modals[0])
-        print("Necessities")
-        print(necessities[0])
-    #'''
 
     done = True
     if not branches:
@@ -749,15 +631,8 @@ def processBranches(branches, modals, done, necessities):
     needed = 1
     while (needed > 0):
         for c in branches:
-            #print("Branch")
-            #print(c)
             needed = len(c)
-
             for d in c:
-
-                # print("String")
-                # print(d)
-
                 # And - add both conjuncts to the branch
                 if (d.startswith('K')):
                     done = False
@@ -786,19 +661,15 @@ def processBranches(branches, modals, done, necessities):
                         rightmodals.append(a)
                     modals.append(rightmodals)
 
-                    # print(necessities)
-
                     rightnec = []
                     for a in necessities[branches.index(c)]:
                         rightnec.append(a)
                     necessities.append(rightnec)
-                    # print(necessities)
 
                     needed = len(c)
 
                 # Not
                 elif (d.startswith('N')):
-                    #print(d)
                     if (d[1] == 'A'):
                         done = False
                         split = parse(d[1:])+1
@@ -808,7 +679,6 @@ def processBranches(branches, modals, done, necessities):
                         needed = len(c)
 
                     elif (d[1] == 'K'):
-                        # print(d)
                         done = False
                         split = parse(d[1:])+1
                         right = []
@@ -820,14 +690,11 @@ def processBranches(branches, modals, done, necessities):
                         right.pop(c.index(d))
                         c.pop(c.index(d))
                         branches.append(right)
-                        # print(branches)
 
                         rightmodals = []
                         for a in modals[branches.index(c)]:
                             rightmodals.append(a)
                         modals.append(rightmodals)
-
-                        # print(necessities)
 
                         rightnec = []
                         for a in necessities[branches.index(c)]:
@@ -843,12 +710,10 @@ def processBranches(branches, modals, done, necessities):
                     needed = needed - 1
 
     open = removeclosed(branches, modals, done, necessities)
-    # print(branches)
 
     branches = open[0]
     modals = open[1]
     necessities = open[3]
-    # print(branches)
 
     for m in branches:
         if "L" in m or "M" in m:
@@ -859,17 +724,8 @@ def processBranches(branches, modals, done, necessities):
 # breaks down modals within a branch
 def processPos(branches, modals, done, necessities):
     #print("Processing possibilities")
-    '''
-    print("Branches")
-    print(branches)
-    print("Possibilities")
-    print(modals)
-    print("Necessities")
-    print(necessities)
-    #'''
-
     done = True
-
+    
     clean(branches)
     if not branches:
         return [branches, modals, done, necessities]
@@ -880,11 +736,6 @@ def processPos(branches, modals, done, necessities):
 
     if not necessities:
         necessities = [] * len(branches)
-
-    '''
-    #need one atomic
-    needed = 1
-    '''
 
     # Possibly - For any leaf, add the possibilities to its list of possibilities
     # while(needed > 0):
@@ -898,13 +749,9 @@ def processPos(branches, modals, done, necessities):
 
         branch = branches[index]
         finished = True
-        '''
-        print(branch)
-        print(index)
-        '''
 
         for string in branch:
-            # print(string)
+
             # Possibly - For string in branch, put its possibility in its corresponding list of possibilities
             if (string.startswith("M")):
                 finished = False
@@ -922,18 +769,6 @@ def processPos(branches, modals, done, necessities):
 
                 if not found:
                     newworld = [string[1:]] + necessities[index]
-                    '''
-                    print("New world")
-                    print(newworld)
-                    print("index")
-                    print(index)
-                    print("Branches")
-                    print(branches)
-                    print("worlds")
-                    print(modals)
-                    print("worldclass")
-                    print(modals[index])
-                    #'''
 
                     if modals[index] == [[]]:
                         modals[index] = [newworld]
@@ -941,103 +776,16 @@ def processPos(branches, modals, done, necessities):
                     else:
                         modals[index].append(newworld)
 
-                    '''
-                    print("Branches")
-                    print(branches)
-                    print("worlds")
-                    print(modals)
-                    #'''
                 branch.pop(branch.index(string))
         if finished:
             index = index + 1
             if index < len(branches):
                 finished = False
 
-        '''
-                Old Code
-
-        for branch in branches:
-                needed = len(branch)
-
-                start = 0
-                while(start < len(branch)):
-                        d = branch[start]
-                        d = tidy(d)
-
-                        #Possibly - For leaf c, put its possibility in its corresponding list of possibilities
-                        if(d.startswith('M')):
-                                done = False
-                                o = tidy(d[1:])
-
-                                found = False
-
-
-
-                                if modals[branches.index(c)] == [[]]:
-                                        newworld = [o] + necessities[start]
-                                        modals[branches.index(c)] = [[o]]
-
-                                #check if there is a world that satisifies it
-                                for a in modals[start]:
-                                        for b in a:
-                                                if(b == o):
-                                                        found = True
-
-                                #if not, create a world with that + the necessities
-
-                                if not found:
-                                        newworld = [o] + necessities[start]
-                                        modals[start].append(newworld)
-        '''
-
-        '''
-                                Old Code
-
-                                if modals[branches.index(c)] == [[]]:
-                                        modals[branches.index(c)] = [[o]]
-                                else:
-                                        modals[branches.index(c)].append([o])
-                                        #necessities.append([])
-                                #print(modals[branches.index(c)]
-
-
-
-                                c.pop(c.index(d))
-                                start = 0
-                                needed = len(c)
-
-
-                        else:
-                                needed = needed - 1
-                                start = start + 1
-        '''
-    '''
-    print("branches")
-    print(branches)
-    print("modals")
-    print(modals)
-    print("necessities")
-    print(necessities)
-    #'''
-
     branches = clean(branches)
     for a in modals:
-        # print(a)
         a = clean(a)
-        # print(a)
-    # print(modals)
-    modals = crashall(modals)
-    # print(modals)
     necessities = clean(necessities)
-
-    '''
-    print("branches")
-    print(branches)
-    print("modals")
-    print(modals)
-    print("necessities")
-    print(necessities)
-    #'''
 
     return [branches, modals, done, necessities]
 
@@ -1047,28 +795,18 @@ def processPos(branches, modals, done, necessities):
 
 def processNec(branches, modals, done, necessities):
     #print("Processing necessities")
-    '''
-    print("Branches")
-    print(branches)
-    print("Necessities - Modals")
-    print(modals)
-    print("Necessities")
-    print(necessities)
-    #'''
 
     done = True
 
     if not necessities:
         necessities = [[]] * len(modals)
-    # print("Necessities")
-    # print(necessities)
 
     if branches:
         needed = 1
         while (needed > 0):
             for c in branches:
                 needed = len(c)
-
+                
                 k = 0
                 while (k < len(c)):
                     c[k] = tidy(c[k])
@@ -1081,17 +819,14 @@ def processNec(branches, modals, done, necessities):
 
                     # For necessities, add them to the branch and the possibilities
                     if (d.startswith('L')):
-
                         done = False
                         c.append(d[1:])
-
                         c.pop(c.index(d))
 
                         f = necessities[branches.index(c)]
                         f.append(d[1:])
 
                         e = modals[branches.index(c)]
-
                         for p in e:
                             if p:
                                 p.append(d[1:])
@@ -1103,30 +838,16 @@ def processNec(branches, modals, done, necessities):
                         needed = needed - 1
                         start = start + 1
 
-    # print(modals)
-
     modals = clean(modals)
     for a in modals:
         a = clean(a)
-    modals = crashall(modals)
     necessities = clean(necessities)
-
-    # print(modals)
 
     temp = closemodals(branches, modals, done, necessities)
     branches = temp[0]
     modals = temp[1]
     done = temp[2]
     necessities = temp[3]
-
-    '''
-    print("Branches")
-    print(branches)
-    print("Necessities - Modals")
-    print(modals)
-    print("Necessities")
-    print(necessities)
-    #'''
 
     return (branches, modals, done, necessities)
 
@@ -1135,16 +856,12 @@ def processNec(branches, modals, done, necessities):
 
 def simplifyworlds(branches, modals, done, necessities):
 
-
     open = removeclosed(branches, modals, done, necessities)
     branches = open[0]
     modals = open[1]
     necessities = open[3]
 
-
-
     branches = clean(branches)
-
 
     done = True
     if not branches:
@@ -1152,11 +869,6 @@ def simplifyworlds(branches, modals, done, necessities):
 
     index = 0
     string = 0
-
-    '''
-    Attempt 3 - Fixed Ma, Mb, Mc
-    '''
-
 
     index = 0
     fin = False
@@ -1166,14 +878,11 @@ def simplifyworlds(branches, modals, done, necessities):
         a = 0
         modallength = len(modals)
         while a < modallength:
-
             b = 0
-
             worldclass = modals[a]
             worldclasslength = len(worldclass)
 
             while b < worldclasslength:
-
                 c = 0
                 world = worldclass[b]
                 fork = False
@@ -1216,9 +925,7 @@ def simplifyworlds(branches, modals, done, necessities):
                         # split the disjuncts between current and new world
 
                         right.append(formula[split:])
-
                         world.append(formula[1:split])
-
                         world.pop(c)
 
                         # Copy the branch and necessities
@@ -1296,35 +1003,24 @@ def simplifyworlds(branches, modals, done, necessities):
 
                             fin = False
                             c = 0
-
-
                     c = c + 1
-
                 b = b + 1
-
             a = a + 1
 
-
     open = removeclosed(branches, modals, done, necessities)
-
-
 
     branches = open[0]
     modals = open[1]
     necessities = open[3]
-    # print(branches)
 
     for m in branches:
         if "L" in m or "M" in m:
             tidy(m)
     return [branches, modals, done, necessities]
 
-
-
 '''
 Change return parameters and eliminate this function.  Just use removeclosed, instead.
 '''
-
 
 # check each branch to see whether one is open (tree is consistent)
 def check(array, modals, done, necessities):
@@ -1333,7 +1029,6 @@ def check(array, modals, done, necessities):
     modals = result[1]
     necessities = result[3]
     return [model, modals, necessities]
-
 
 # Test Function - Tells you whether a set is consistent
 
@@ -1382,11 +1077,6 @@ def testing(array):
 
     case = processFormulas(case[0], case[1], case[2], case[3])
 
-    '''
-    if case:
-        print(case[0])
-    '''
-
     nonmodal = False
     pos = False
     nec = False
@@ -1408,20 +1098,15 @@ def testing(array):
             didstuff = True
 
             case = processBranches(case[0], case[1], case[2], case[3])
-
             nonmodal = case[2]
-
             case = processPos(case[0], case[1], case[2], case[3])
-
             pos = case[2]
             necessities = case[3]
-
 
             case = processNec(case[0], case[1], case[2], case[3])
             nec = case[2]
 
             necessities = case[3]
-
 
             done = nonmodal and pos and nec
             complete = done
@@ -1430,46 +1115,37 @@ def testing(array):
             result = check(case[0], case[1], True, necessities)
             model = result[0]
             worlds = result[1]
-            worlds = crashall(worlds)
             necessities = result[2]
         model = clean(model)
-
 
         # break down all the worlds that still contain non-modal connectives
 
         done = False
-
         while not done:
-
             done = True
             index = 0
-
             if (empty(worlds)):
                 pass
-
             else:
                 case = simplifyworlds(model, worlds, done, necessities)
-
+                
                 model = case[0]
                 worlds = case[1]
-
                 done = done and case[2]
                 complete = complete and done
                 necessities = case[3]
-
+                
         result = check(model, worlds, True, necessities)
         model = result[0]
         worlds = result[1]
-        worlds = crashall(worlds)
         necessities = result[2]
         model = clean(model)
 
         # break down worlds that still contain M
 
         done = False
-
+        
         while not done:
-
             done = True
             index = 0
 
@@ -1498,15 +1174,10 @@ def testing(array):
                 worlds[index] = worldclass
                 index = index + 1
 
-        worlds = crashall(worlds)
-
-
         result = check(model, worlds, True, necessities)
         model = result[0]
         worlds = result[1]
-        # worlds = crashall(worlds)
         necessities = result[2]
-        # model = clean(model)
 
         # break down worlds that still contain L
 
@@ -1543,12 +1214,9 @@ def testing(array):
                 worlds[index] = worldclass
                 index = index + 1
 
-        worlds = crashall(worlds)
-
         result = check(model, worlds, True, necessities)
         model = result[0]
         worlds = result[1]
-        worlds = crashall(worlds)
         necessities = result[2]
         model = clean(model)
 
@@ -1578,7 +1246,6 @@ def testing(array):
                 j = j + 1
             i = i + 1
 
-
         i = 0
         j = 0
         k = 0
@@ -1595,39 +1262,17 @@ def testing(array):
             for m in w:
                 if "L" in m or "K" in m or "A" in m or "L" in m or "C" in m:
                     complete = False
-                    '''
-                    print(m)
-                if complete:
-                    print("Models are atomic")
-                    print(model[0])
-                    '''
 
         for w in worlds:
             for a in w:
                 for m in a:
                     if "L" in m or "K" in m or "A" in m or "L" in m or "C" in m:
                         complete = False
-                        '''
-                        print(m)
-                    if complete:
-                        #print("Worlds are atomic")
-                        #print(worlds[0])
-
-        '''               '''
-        print("Loop")
-        if model:
-            print(model[0])
-            print(worlds[0])
-        '''
 
         case = [model, worlds, True, necessities]
 
-
     '''
-
     End the loop here.
     '''
 
     return [model, worlds, necessities]
-
-
